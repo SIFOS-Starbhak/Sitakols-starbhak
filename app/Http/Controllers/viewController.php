@@ -30,6 +30,7 @@ class viewController extends Controller
     // admin view
     public function dashboard()
     {
+        // dd(Auth::user()->role);
         $tahun = Carbon::now()->format('Y');
         $tahunDepan = Carbon::now()->addYear(1)->format('Y');
     $perusahaan = perusahaan::all()->count();

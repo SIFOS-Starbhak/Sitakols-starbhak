@@ -81,7 +81,7 @@ class userController extends Controller
     public function index(Request $request)
 
     {
-    $siswa = siswa::where('id_user',Auth::user()->siswa->id)->first();
+    $siswa = Auth::user()->siswa;
      $pembekalan_magang =   pembekalan_magang::where('id_siswa',$siswa->id)->first();
      $jurnalH_siswa = jurnal_harian::where('id_siswa',$siswa->id)->get();
      $jurnalP_siswa = jurnal_prakerin::where('id_siswa',$siswa->id)->get();

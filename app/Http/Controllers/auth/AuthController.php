@@ -55,7 +55,7 @@ class AuthController extends Controller
 
         Auth::logout();
         session()->flush();
-        return response()->json(['success' => "berhasil logout", 'token' => $_COOKIE['sitakols_secreat'], 'role' => $_COOKIE['sitakols_role']]);
+        return response()->json(['success' => "berhasil logout",'role' => $_COOKIE['sitakols_role']]);
         // Cookie::queue(Cookie::forget('sitakols_secreat'));
 
     }
@@ -70,26 +70,49 @@ class AuthController extends Controller
         if (empty($token)) {
             return back();
         }
-        // set cookie untuk token jika make url
 
-        $jwt_token = JWT::decode($token, "1342423424324324234", array('HS256')); // decode token
-        Cookie::queue("sitakols_secreat", $jwt_token->token, time() * 3600);
+        // get post data api/me
+        $ch = curl_init(); // curl post ke web sekolah
+        curl_setopt_array(
+            $ch,
+            array(
+                CURLOPT_URL => 'http://127.0.0.1:8000/api/me', // seusai sama url 
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_HTTPHEADER => array(
+                    "X-Requested-With: XMLHttpRequest",
+                    'Authorization: Bearer ' . $token,
+                ),
+            )
+        );
+        // Send the request 
+        $response = curl_exec($ch); // get reponse
 
+        // Check for errors 
+        if ($response === false) {
+            die(curl_error($ch));
+        }
+        // Close the cURL handler 
+        curl_close($ch);;
+        // Print the date from the response 
+        $api_res = json_decode($response, true);  // decode response dari json ke arrau
+
+        // decode token response dari api/me web sekolah
+        $jwt_token = JWT::decode($api_res['token'], "1342423424324324234", array('HS256')); // decode token
         // mencari data user  yang sudah ada
         $user = User::where('username', $jwt_token->auth->username)->first();
         // cek role
-        switch ($jwt_token->role) {
-            case 'apiSiswa':
-                $role = "siswa";
-                Cookie::queue("sitakols_role", $jwt_token->role, time() * 3600);
+        switch ($jwt_token->auth->role) {
+            case 'siswa':
+                $role = $jwt_token->user->spesifc_role;
+                Cookie::queue("sitakols_role", $jwt_token->auth->role, time() * 3600);
                 break;
-            case 'apiGuru':
-                $role = $jwt_token->user_data->jabatan; // guru
-                Cookie::queue("sitakols_role", $jwt_token->role, time() * 3600);
+            case 'guru':
+                $role =  $jwt_token->user->spesifc_role; // guru
+                Cookie::queue("sitakols_role", $jwt_token->auth->role, time() * 3600);
                 break;
-            case 'apiManager':
-                $role = $jwt_token->user_data->jabatan;
-                Cookie::queue("sitakols_role", $jwt_token->role, time() * 3600);
+            case 'manager':
+                $role =  $jwt_token->user->spesifc_role;
+                Cookie::queue("sitakols_role", $jwt_token->auth->role, time() * 3600);
                 break;
             default:
                 # code...fggngn
@@ -98,28 +121,28 @@ class AuthController extends Controller
         // jika ada login lalu update
         if (Auth::attempt(['username' => $jwt_token->auth->username, 'password' => $jwt_token->auth->password])) {
             $user->update(['username' => $jwt_token->auth->username, 'password' => Hash::make($jwt_token->auth->password), 'role' => $role]);
-            switch ($jwt_token->role) {
-                case 'apiSiswa':
+            switch ($jwt_token->auth->role) {
+                case 'siswa':
                     Siswa::where('id_user', $user->id)->update([
-                        'nipd' => $jwt_token->user_data->nipd,
-                        'nama_siswa' => $jwt_token->user_data->name,
+                        'nipd' => $jwt_token->user->nomor_induk,
+                        'nama_siswa' => $jwt_token->user->name,
                         'nisn' => 'empty',
                         'tempat_lahir' => 'empty',
                         'tanggal_lahir' => '0000-00-00',
-                        'kelas' =>  $jwt_token->kelas->nama_kelas,
+                        'kelas' =>  $jwt_token->kelas->kelas,
                         'jurusan' => $jwt_token->kelas->jurusan,
                     ]);
                     session()->regenerate();
                     return redirect('/user/dashboard');
                     break;
                     break;
-                case 'apiGuru':
-                case 'apiManager':
+                case 'guru':
+                case 'manager':
                     guru::where('id_user', $user->id)->update([
-                        'nik' => $jwt_token->user_data->nik ,
-                        'nama' =>  $jwt_token->user_data->name ,
+                        'nik' => $jwt_token->user->nomor_induk  ,
+                        'nama' =>  $jwt_token->user->name ,
                         'jabatan' => null,
-                        'no_telp' => null,
+                        'no_telp' => '00000000',
                     ]);
                     session()->regenerate();
                     return redirect('/admin/dashboard');
@@ -128,31 +151,31 @@ class AuthController extends Controller
         }else{ // jika password salah
             if(isset($user)){ // jik user masih ada setelah itu update sesuai sama role nya
                 $user->update(['username' => $jwt_token->auth->username, 'password' => Hash::make($jwt_token->auth->password), 'role' => $role]);
-                switch ($jwt_token->tole) {
-                    case 'apiSiswa':
+                switch ($jwt_token->auth->role) {
+                    case 'siswa':
                         Siswa::where('id_user', $user->id)->update([
-                            'nipd' => $jwt_token->user_data->nipd,
-                            'nama_siswa' => $jwt_token->user_data->name,
+                            'nipd' => $jwt_token->user->nomor_induk,
+                            'nama_siswa' => $jwt_token->user->nomor_induk,
                             'nisn' => 'empty',
                             'tempat_lahir' => 'empty',
                             'tanggal_lahir' => '0000-00-00',
-                            'kelas' =>  $jwt_token->kelas->nama_kelas,
+                            'kelas' =>  $jwt_token->kelas->kelas,
                             'jurusan' => $jwt_token->kelas->jurusan,
                         ]);
                         break;
-                    case 'apiGuru':
-                    case 'apiManager':
+                    case 'guru':
+                    case 'manager':
                         guru::where('id_user', $user->id)->update([
-                            'nik' => $jwt_token->user_data->nik,
-                            'nama' =>  $jwt_token->user_data->name,
+                            'nik' => $jwt_token->user->nomor_induk,
+                            'nama' =>  $jwt_token->user->name,
                             'jabatan' => null,
-                            'no_telp' => null,
+                            'no_telp' => '00000000',
                         ]);
                         break;
                 }
                 // attemp
                 if (Auth::attempt(['username' => $jwt_token->auth->username, 'password' => $jwt_token->auth->password])) {
-                    switch ($jwt_token->role) {
+                    switch ($jwt_token->user->spesifc_role) {
                         case 'siswa':
                             session()->regenerate();
                             return redirect('/user/dashboard');
@@ -164,40 +187,43 @@ class AuthController extends Controller
                     }
                 }
             }else{ // jika user tisak ada buat baru
-                if ($jwt_token->role == "apiSiswa") {
-                    $user = User::create([
-                        'username' => $jwt_token->auth->username,
-                        'password' => Hash::make($jwt_token->auth->password),
-                    ]);
+                $user = User::create([
+                    'username' => $jwt_token->auth->username,
+                    'password' => Hash::make($jwt_token->auth->password),
+                    'role' => $jwt_token->user->spesifc_role
+                ]);
+                if ($jwt_token->auth->role == "siswa") {
                     $siswa = Siswa::create([
-                        'nipd' => $jwt_token->user_data->nipd,
-                        'nama_siswa' => $jwt_token->user_data->name,
+                        'nipd' => $jwt_token->user->nomor_induk,
+                        'nama_siswa' => $jwt_token->user->name,
                         'nisn' => 'empty',
                         'tempat_lahir' => 'empty',
                         'tanggal_lahir' => Carbon::now()->format('Y-m-d'),
-                        'kelas' =>  $jwt_token->kelas->nama_kelas,
+                        'kelas' =>  $jwt_token->kelas->kelas,
                         'jurusan' => $jwt_token->kelas->jurusan,
                         'id_user' => $user->id,
                     ]);
                     // attemp
-                    if (Auth::attempt(['username' => $jwt_token->auth->username, 'password' => $jwt_token->auth->password])) {
-                        session()->regenerate();
-                        return redirect('/user/dashboard');
-                    }
                 } else {
-                    $user = User::create([
-                        'username' => $jwt_token->auth->username,
-                        'password' => Hash::make($jwt_token->auth->password),
-                    ]);
-                    guru::where('id_user', $user->id)->update([
-                        'nik' => $jwt_token->user_data->nik,
-                        'nama' =>  $jwt_token->user_data->name,
+                    guru::create([
+                        'nik' => $jwt_token->user->nomor_induk,
+                        'nama' =>  $jwt_token->user->name,
                         'jabatan' => null,
-                        'no_telp' => null,
+                        'no_telp' => '00000000',
+                        'id_user' => $user->id
                     ]);
-                    if (Auth::attempt(['username' => $jwt_token->auth->username, 'password' => $jwt_token->auth->password])) {
-                        session()->regenerate();
-                        return redirect('/admin/dashboard');
+                }
+
+                if (Auth::attempt(['username' => $jwt_token->auth->username, 'password' => $jwt_token->auth->password])) {
+                    switch ($jwt_token->user->spesifc_role) {
+                        case 'siswa':
+                            session()->regenerate();
+                            return redirect('/user/dashboard');
+                            break;
+                        default:
+                            session()->regenerate();
+                            return redirect('/admin/dashboard');
+                            break;
                     }
                 }
 

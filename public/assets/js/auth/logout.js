@@ -24,14 +24,14 @@ $(document).ready(function () {
                         // jika tidak redirect ke dashboard
                         root = window.location.protocol + '//' + window.location.host;
                         switch (response.role) {
-                            case 'apiSiswa':
-                                window.location.href = "http://localhost:8000/siswa/dashboard?token=" + response.token;
+                            case 'siswa':
+                                window.location.href = "http:///127.0.0.1:8000/siswa/dashboard";
                                 break;
-                            case 'apiGuru':
-                                window.location.href = "http://localhost:8000/guru/dashboard?token=" + response.token;
+                            case 'guru':
+                                window.location.href = "http://127.0.0.1:8000/guru/dashboard";
                                 break;
-                            case 'apiManager':
-                                window.location.href = "http://localhost:8000/manager/dashboard?token=" + response.token;
+                            case 'manager':
+                                window.location.href = "http:///127.0.0.1:8000/manager/dashboard";
                                 break;
                         }
 
