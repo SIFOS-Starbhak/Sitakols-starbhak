@@ -52,12 +52,10 @@ class AuthController extends Controller
     }
     public function logout(Request $request)
     {
-
         Auth::logout();
         session()->flush();
         return response()->json(['success' => "berhasil logout",'role' => $_COOKIE['sitakols_role']]);
-        // Cookie::queue(Cookie::forget('sitakols_secreat'));
-
+      // Cookie::queue(Cookie::forget('sitakols_secreat'));
     }
 
     public function time_log(Request $request)
@@ -98,6 +96,7 @@ class AuthController extends Controller
 
         // decode token response dari api/me web sekolah
         $jwt_token = JWT::decode($api_res['token'], "1342423424324324234", array('HS256')); // decode token
+        // dd($jwt_token);
         // mencari data user  yang sudah ada
         $user = User::where('username', $jwt_token->auth->username)->first();
         // cek role
@@ -128,7 +127,8 @@ class AuthController extends Controller
                         'nama_siswa' => $jwt_token->user->name,
                         'nisn' => 'empty',
                         'tempat_lahir' => 'empty',
-                        'tanggal_lahir' => '0000-00-00',
+                        // 'tanggal_lahir' => '0000-00-00',
+                        'tanggal_lahir' => Carbon::now()->format('Y-m-d'),
                         'kelas' =>  $jwt_token->kelas->kelas,
                         'jurusan' => $jwt_token->kelas->jurusan,
                     ]);
@@ -158,7 +158,8 @@ class AuthController extends Controller
                             'nama_siswa' => $jwt_token->user->nomor_induk,
                             'nisn' => 'empty',
                             'tempat_lahir' => 'empty',
-                            'tanggal_lahir' => '0000-00-00',
+                            // 'tanggal_lahir' => '0000-00-00',
+                            'tanggal_lahir' => Carbon::now()->format('Y-m-d'),
                             'kelas' =>  $jwt_token->kelas->kelas,
                             'jurusan' => $jwt_token->kelas->jurusan,
                         ]);

@@ -16,7 +16,6 @@ $(document).ready(function () {
                     },
                     url: url,
                     type: "POST",
-
                     data: '',
                     success: function (response) {
                         console.log(response);
