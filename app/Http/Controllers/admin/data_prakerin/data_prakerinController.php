@@ -97,7 +97,7 @@ class data_prakerinController extends Controller
         $siswa = Siswa::doesntHave('data_prakerin')->get();
         $perusahaan = perusahaan::all();
         $guru = guru::doesntHave('kelompok_laporan')->get();
-        $kelas = kelas::all();
+        $kelas = kelas::has('jurusan')->get();
         return view('admin.data_prakerin.tambah', compact('siswa','perusahaan','guru','kelas'));
     }
 
@@ -146,7 +146,7 @@ class data_prakerinController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response    
      */
     public function edit($id)
     {
@@ -154,7 +154,7 @@ class data_prakerinController extends Controller
         $perusahaan = perusahaan::all();
         $guru = guru::all();
         $dataPrakerin = data_prakerin::findOrFail($id);
-        $kelas = kelas::all();
+        $kelas = kelas::has('jurusan')->get();
         // dd($dataPrakerin->perusahaan->nama);
         return view('admin.data_prakerin.edit',compact('dataPrakerin','perusahaan','guru','siswa','id','kelas'));
     }
