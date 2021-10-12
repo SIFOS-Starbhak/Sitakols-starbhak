@@ -24,13 +24,16 @@ $(document).ready(function () {
                         root = window.location.protocol + '//' + window.location.host;
                         switch (response.role) {
                             case 'siswa':
-                                window.location.href = "http:///127.0.0.1:8000/siswa/dashboard";
+                                // window.location.href = "http://127.0.0.1:8000/siswa/dashboard";
+                                window.location.href = "http://117.102.67.70/siswa/dashboard";
                                 break;
                             case 'guru':
-                                window.location.href = "http://127.0.0.1:8000/guru/dashboard";
+                                // window.location.href = "http://127.0.0.1:8000/guru/dashboard";
+                                window.location.href = "http://117.102.67.70/guru/dashboard";
                                 break;
                             case 'manager':
-                                window.location.href = "http:///127.0.0.1:8000/manager/dashboard";
+                                // window.location.href = "http:///127.0.0.1:8000/manager/dashboard";
+                                window.location.href = "http://117.102.67.70/manager/dashboard";
                                 break;
                         }
 

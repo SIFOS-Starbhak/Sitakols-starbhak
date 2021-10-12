@@ -68,13 +68,13 @@ class AuthController extends Controller
         if (empty($token)) {
             return back();
         }
-
         // get post data api/me
         $ch = curl_init(); // curl post ke web sekolah
         curl_setopt_array(
             $ch,
             array(
-                CURLOPT_URL => 'http://127.0.0.1:8000/api/me', // seusai sama url 
+                // CURLOPT_URL => 'http://127.0.0.1:8000/api/me', // seusai sama url 
+                CURLOPT_URL => 'http://117.102.67.70/api/me', // seusai sama url 
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_HTTPHEADER => array(
                     "X-Requested-With: XMLHttpRequest",
