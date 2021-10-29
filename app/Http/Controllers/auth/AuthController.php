@@ -73,8 +73,8 @@ class AuthController extends Controller
         curl_setopt_array(
             $ch,
             array(
-                // CURLOPT_URL => 'http://127.0.0.1:8000/api/me', // seusai sama url 
-                CURLOPT_URL => 'http://117.102.67.70/api/me', // seusai sama url 
+                // CURLOPT_URL => 'http://127.0.0.1:8000/api/me', // seusai sama url
+                CURLOPT_URL => 'http://117.102.67.70/api/me', // seusai sama url
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_HTTPHEADER => array(
                     "X-Requested-With: XMLHttpRequest",
@@ -82,16 +82,16 @@ class AuthController extends Controller
                 ),
             )
         );
-        // Send the request 
+        // Send the request
         $response = curl_exec($ch); // get reponse
 
-        // Check for errors 
+        // Check for errors
         if ($response === false) {
             die(curl_error($ch));
         }
-        // Close the cURL handler 
+        // Close the cURL handler
         curl_close($ch);;
-        // Print the date from the response 
+        // Print the date from the response
         $api_res = json_decode($response, true);  // decode response dari json ke arrau
 
         // decode token response dari api/me web sekolah
@@ -141,7 +141,7 @@ class AuthController extends Controller
                     guru::where('id_user', $user->id)->update([
                         'nik' => $jwt_token->user->nomor_induk  ,
                         'nama' =>  $jwt_token->user->name ,
-                        'jabatan' => null,
+                        'jabatan' => $jwt_token->user->spesifc_role,
                         'no_telp' => '00000000',
                     ]);
                     session()->regenerate();
@@ -169,7 +169,7 @@ class AuthController extends Controller
                         guru::where('id_user', $user->id)->update([
                             'nik' => $jwt_token->user->nomor_induk,
                             'nama' =>  $jwt_token->user->name,
-                            'jabatan' => null,
+                            'jabatan' => $jwt_token->user->spesifc_role,
                             'no_telp' => '00000000',
                         ]);
                         break;
@@ -181,7 +181,7 @@ class AuthController extends Controller
                             session()->regenerate();
                             return redirect('/user/dashboard');
                             break;
-                        case  'bkk' or 'tu' or 'kepsek' or 'hubin' or 'kurikulum' or 'kesiswaan' or 'litbang' or 'sarpras':
+                        case  'bkk' or 'tu' or 'kepsek' or 'hubin' or 'kurikulum' or 'kesiswaan' or 'litbang' or 'sarpras' :
                             session()->regenerate();
                             return redirect('/admin/dashboard');
                             break;
@@ -209,7 +209,7 @@ class AuthController extends Controller
                     guru::create([
                         'nik' => $jwt_token->user->nomor_induk,
                         'nama' =>  $jwt_token->user->name,
-                        'jabatan' => null,
+                        'jabatan' => $jwt_token->user->spesifc_role,
                         'no_telp' => '00000000',
                         'id_user' => $user->id
                     ]);
