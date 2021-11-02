@@ -25,15 +25,19 @@ $(document).ready(function () {
                         switch (response.role) {
                             case 'siswa':
                                 // window.location.href = "http://127.0.0.1:8000/siswa/dashboard";
-                                window.location.href = "http://117.102.67.70/siswa/dashboard";
+                                window.location.href = "http://new.smktarunbhakti.net/siswa/dashboard";
                                 break;
                             case 'guru':
                                 // window.location.href = "http://127.0.0.1:8000/guru/dashboard";
-                                window.location.href = "http://117.102.67.70/guru/dashboard";
+                                window.location.href = "http://new.smktarunbhakti.net/guru/dashboard";
                                 break;
                             case 'manager':
                                 // window.location.href = "http:///127.0.0.1:8000/manager/dashboard";
-                                window.location.href = "http://117.102.67.70/manager/dashboard";
+                                window.location.href = "http://new.smktarunbhakti.net/manager/dashboard";
+                                break;
+                            case 'admin':
+                                // window.location.href = "http:///127.0.0.1:8000/adm/dashboard";
+                                window.location.href = "http://new.smktarunbhakti.net/adm/dashboard";
                                 break;
                         }
 

@@ -74,7 +74,8 @@ class AuthController extends Controller
             $ch,
             array(
                 // CURLOPT_URL => 'http://127.0.0.1:8000/api/me', // seusai sama url
-                CURLOPT_URL => 'http://117.102.67.70/api/me', // seusai sama url
+                CURLOPT_URL => 'http://new.smktarunabhakti.net/api/me', // seusai sama url 
+                // CURLOPT_URL => 'http://117.102.67.70/api/me', // seusai sama url
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_HTTPHEADER => array(
                     "X-Requested-With: XMLHttpRequest",
@@ -209,11 +210,12 @@ class AuthController extends Controller
                     guru::create([
                         'nik' => $jwt_token->user->nomor_induk,
                         'nama' =>  $jwt_token->user->name,
-                        'jabatan' => $jwt_token->user->spesifc_role,
+                        'jabatan' => null,
                         'no_telp' => '00000000',
                         'id_user' => $user->id
                     ]);
                 }
+
 
                 if (Auth::attempt(['username' => $jwt_token->auth->username, 'password' => $jwt_token->auth->password])) {
                     switch ($jwt_token->user->spesifc_role) {
