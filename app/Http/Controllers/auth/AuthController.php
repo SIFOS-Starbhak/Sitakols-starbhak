@@ -130,8 +130,8 @@ class AuthController extends Controller
                         'tempat_lahir' => 'empty',
                         // 'tanggal_lahir' => '0000-00-00',
                         'tanggal_lahir' => Carbon::now()->format('Y-m-d'),
-                        'kelas' =>  $jwt_token->kelas->kelas,
-                        'jurusan' => $jwt_token->kelas->jurusan,
+                        'kelas' =>  explode(' ',$jwt_token->kelas->nama_kelas)[0],
+                        'jurusan' => explode(' ',$jwt_token->kelas->nama_kelas)[1],
                     ]);
                     session()->regenerate();
                     return redirect('/user/dashboard');
@@ -154,6 +154,7 @@ class AuthController extends Controller
                 $user->update(['username' => $jwt_token->auth->username, 'password' => Hash::make($jwt_token->auth->password), 'role' => $role]);
                 switch ($jwt_token->auth->role) {
                     case 'siswa':
+                        // dd(explode($jwt_token->kelas->nama_kelas)[0]);
                         Siswa::where('id_user', $user->id)->update([
                             'nipd' => $jwt_token->user->nomor_induk,
                             'nama_siswa' => $jwt_token->user->nomor_induk,
@@ -161,8 +162,8 @@ class AuthController extends Controller
                             'tempat_lahir' => 'empty',
                             // 'tanggal_lahir' => '0000-00-00',
                             'tanggal_lahir' => Carbon::now()->format('Y-m-d'),
-                            'kelas' =>  $jwt_token->kelas->kelas,
-                            'jurusan' => $jwt_token->kelas->jurusan,
+                            'kelas' =>  explode(' ',$jwt_token->kelas->nama_kelas)[0],
+                            'jurusan' => explode(' ',$jwt_token->kelas->nama_kelas)[1],
                         ]);
                         break;
                     case 'guru':
@@ -201,8 +202,8 @@ class AuthController extends Controller
                         'nisn' => 'empty',
                         'tempat_lahir' => 'empty',
                         'tanggal_lahir' => Carbon::now()->format('Y-m-d'),
-                        'kelas' =>  $jwt_token->kelas->kelas,
-                        'jurusan' => $jwt_token->kelas->jurusan,
+                        'kelas' =>  explode(' ',$jwt_token->kelas->nama_kelas)[0],
+                        'jurusan' => explode(' ',$jwt_token->kelas->nama_kelas)[1],
                         'id_user' => $user->id,
                     ]);
                     // attemp
